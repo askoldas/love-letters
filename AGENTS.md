@@ -26,6 +26,7 @@ Before implementing anything, read:
 - `docs/database-schema.md`
 - `docs/admin-moderation.md`
 - `docs/roadmap.md`
+- `docs/implementation-plan.md`
 
 If any implementation request conflicts with these docs, point it out and propose the smallest coherent adjustment.
 
@@ -46,9 +47,13 @@ Keep these decisions unless explicitly changed:
 11. Use hearts/likes. Liked = effectively saved/bookmarked for the visitor.
 12. Homepage should be emotional and simple, centered around the heart made of letters.
 13. Letter reading should be modal-first.
-14. Archive rankings belong on `/archive`, not on the homepage.
-15. Future physical formats belong mostly on `/about`.
-16. Do not build Etsy-related features in this repository.
+14. Letter submission should be modal-first.
+15. Do **not** create a separate `/submit` public page for MVP.
+16. Do **not** create a separate `/letter/[archiveNumber]` public page for MVP.
+17. Shareable letter links should use a query parameter, for example `/?letter=000127` or `/archive?letter=000127`, and open the selected letter in a modal.
+18. Archive rankings belong on `/archive`, not on the homepage.
+19. Future physical formats belong mostly on `/about`.
+20. Do not build Etsy-related features in this repository.
 
 ## UX requirements
 
@@ -58,13 +63,15 @@ Keep these decisions unless explicitly changed:
 - Main interaction: `Open random letter`.
 - Include `View archive`.
 - Include sticky bottom-right CTA: `Write your letter`.
+- Sticky CTA opens submit modal.
 - Do not overload homepage with full archive/ranking sections.
 
-### Submit
+### Submit modal
 
+- The submit flow opens in an overlay modal, not a separate page.
 - First ask user to write the letter.
 - Do not make email the first step.
-- After successful submit, show archive number and optional email field.
+- After successful submit, show archive number and optional email field in the same modal flow.
 - Make it clear email is not public.
 
 ### Letter modal
@@ -154,7 +161,7 @@ Avoid:
 - Keep public components accessible and responsive.
 - Keep copy easy to translate later.
 
-## Suggested future app structure
+## Suggested app structure
 
 This is a suggestion, not a strict requirement:
 
@@ -163,9 +170,7 @@ app/
   layout.tsx
   page.tsx
   archive/page.tsx
-  submit/page.tsx
   about/page.tsx
-  letter/[archiveNumber]/page.tsx
   admin/layout.tsx
   admin/page.tsx
   admin/letters/page.tsx
@@ -173,11 +178,15 @@ app/
   api/letters/random/route.ts
   api/letters/like/route.ts
   api/letters/share/route.ts
+  api/letters/email-link/route.ts
 components/
   home/
   archive/
   letters/
+    LetterModal.tsx
+    LetterCard.tsx
   submit/
+    SubmitLetterModal.tsx
   admin/
 lib/
   supabase/
@@ -185,6 +194,8 @@ lib/
   email/
   formatters/
 ```
+
+Do not add `app/submit/page.tsx` or `app/letter/[archiveNumber]/page.tsx` for MVP unless explicitly requested.
 
 ## Naming and language
 
@@ -211,9 +222,11 @@ Do not implement:
 - direct author edit/delete dashboard
 - automatic publication without moderation
 - heavy AI content generation
+- separate public `/submit` page
+- separate public `/letter/[archiveNumber]` page
 
 ## When unsure
 
-Prefer the simpler archive-first solution.
+Prefer the simpler modal-first archive solution.
 
 If a requested feature risks scope creep, explain the tradeoff and suggest MVP-safe implementation.
