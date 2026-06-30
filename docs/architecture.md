@@ -38,13 +38,8 @@ app/
   page.tsx
   archive/
     page.tsx
-  submit/
-    page.tsx
   about/
     page.tsx
-  letter/
-    [archiveNumber]/
-      page.tsx
   admin/
     layout.tsx
     page.tsx
@@ -59,19 +54,30 @@ app/
       like/route.ts
       share/route.ts
       email-link/route.ts
+      by-number/route.ts
     admin/
       approve/route.ts
       reject/route.ts
       feature/route.ts
 ```
 
-This is only a suggested structure. Prefer server actions where simpler, but keep validation and abuse protection on the server.
+Do not create `app/submit/page.tsx` or `app/letter/[archiveNumber]/page.tsx` for MVP. Submit and letter reading are modal-first.
+
+Prefer server actions where simpler, but keep validation and abuse protection on the server.
 
 ## Public routes
 
 ### `/`
 
-Homepage with letter heart and random letter modal.
+Homepage with letter heart, random letter modal and submit-letter modal.
+
+Supported query param:
+
+```txt
+/?letter=000127
+```
+
+If the letter exists and is approved, open it in modal.
 
 ### `/archive`
 
@@ -84,17 +90,34 @@ Archive browse page with tabs/sections:
 
 Clicking a card opens a modal.
 
-### `/submit`
+Supported query param:
 
-Letter composition and post-submit email capture.
+```txt
+/archive?letter=000127
+```
+
+If the letter exists and is approved, open it in modal.
 
 ### `/about`
 
 Project story and future physical formats.
 
-### `/letter/[archiveNumber]`
+### No `/submit` page in MVP
 
-Shareable route. It should not feel like a separate article page. It can render the normal site and open the matching letter in a modal.
+Letter composition is handled by a global submit modal opened from:
+
+- sticky `Write your letter` CTA
+- header action
+- letter modal secondary action
+
+### No `/letter/[archiveNumber]` page in MVP
+
+Sharing should use query-param modal links:
+
+```txt
+/?letter=000127
+/archive?letter=000127
+```
 
 If the letter is not approved, show a safe fallback:
 
@@ -124,7 +147,7 @@ Public users should not register.
 They can:
 
 - read approved letters
-- submit a letter
+- submit a letter through modal
 - optionally add email after submission
 - like/heart approved letters
 - share approved letters
@@ -146,7 +169,7 @@ Email is optional and requested after successful submission.
 Recommended events:
 
 1. Letter submitted: show archive number immediately.
-2. User optionally provides email.
+2. User optionally provides email in confirmation step of modal.
 3. Send confirmation email with letter number/status.
 4. After approval, send published email with public link.
 5. `Find my letter` sends letter links to the entered email if matches exist.
@@ -172,30 +195,37 @@ Server:
 - validate length and consent
 - assign `archive_number`
 - insert with status `pending`
-- return archive number
+- return archive number and enough short-lived context for the same modal session to add email
 
 ### Add email after submit
 
 Input:
 
-- archive number or internal letter id returned from submit
+- internal letter id returned from submit, kept only in the current modal/browser session
 - email
 
 Server:
 
 - validate email
-- attach email to pending letter if allowed
+- attach email to that newly submitted pending letter if allowed
 - send confirmation email
 
-Do not allow arbitrary public update of any letter just by archive number. The immediate post-submit page can hold the internal id in memory/session. For MVP, keep it simple but avoid open update endpoints that can attach emails to someone else's letter.
-
-Safer options:
-
-- after submit, return internal id and one short-lived session value
-- or store email in same submit request if user provides it before leaving confirmation screen
-- or require email immediately in the same browser session
+Do not allow arbitrary public update of any letter just by archive number. Avoid open endpoints that can attach emails to someone else's letter.
 
 No long-lived tokens are needed.
+
+### Fetch approved letter by number
+
+Used for share links and archive search.
+
+Input:
+
+- archive number
+
+Server:
+
+- return safe public fields only if status is `approved`
+- otherwise return unavailable/not found state
 
 ### Random letter
 
@@ -231,6 +261,7 @@ Minimum MVP:
 
 - increment shares_count when user clicks share
 - use native share/copy link on client
+- generated share URL should be `/?letter=000127` or `/archive?letter=000127`
 
 ## Data access and security
 
