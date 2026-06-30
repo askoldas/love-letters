@@ -4,7 +4,7 @@ This plan is for the first real MVP implementation.
 
 ## Stage 1 — Project setup
 
-Create Next.js app with TypeScript.
+Create a Next.js app with TypeScript.
 
 Recommended choices:
 
@@ -70,12 +70,20 @@ Build `/`:
 - `View archive` link
 - sticky `Write your letter` CTA
 - letter modal component
+- submit letter modal component
+- support `?letter=000127` to open a selected approved letter in modal
 
 The heart visual can start as an image asset or placeholder. Keep component structure ready for replacement with final art.
 
-## Stage 5 — Submit flow
+## Stage 5 — Submit modal flow
 
-Build `/submit`:
+Letter submission should happen in a global modal, not in a separate public page.
+
+Open the submit modal from:
+
+- sticky CTA
+- header action
+- letter modal `Write your own letter` action
 
 Step 1:
 
@@ -127,6 +135,8 @@ Each card opens the modal.
 
 Add search by archive number.
 
+Support `/archive?letter=000127` to open a selected approved letter in modal.
+
 ## Stage 8 — Random letter
 
 Create API/server function:
@@ -152,21 +162,27 @@ No separate bookmark feature.
 
 Implement share action:
 
-- generate link to `/letter/[archiveNumber]` or archive query param
+- generate link to `/?letter=000127` from homepage context
+- generate link to `/archive?letter=000127` from archive context
 - use Web Share API if available
 - fallback copy to clipboard
 - increment `shares_count`
 
-## Stage 11 — Shareable modal route
+Use query-parameter deep links for MVP.
 
-Implement `/letter/[archiveNumber]` route.
+## Stage 11 — Query-param modal deep links
+
+Implement deep-link behavior for:
+
+```txt
+/?letter=000127
+/archive?letter=000127
+```
 
 Behavior:
 
-- if letter approved: render normal layout with modal open
-- if not approved/missing: show safe unavailable message
-
-Do not create a heavy article-style page unless explicitly requested.
+- if letter approved: render normal page with modal open
+- if not approved/missing: show safe unavailable state
 
 ## Stage 12 — Email
 
@@ -208,7 +224,7 @@ Check:
 Start with:
 
 ```txt
-Create the Next.js project structure, basic routes, shared layout, design tokens, placeholder heart hero, submit page shell, archive page shell, and Supabase helper files. Do not implement database mutations yet. Follow README.md, AGENTS.md and docs/*.md.
+Create the Next.js project structure, basic public routes, shared layout, design tokens, placeholder heart hero, letter modal, submit-letter modal, archive page shell, about page shell, admin shell, and Supabase helper files. Do not implement database mutations yet. Keep public reading and writing modal-first. Follow README.md, AGENTS.md and docs/*.md.
 ```
 
 Then implement database and flows in smaller steps.
