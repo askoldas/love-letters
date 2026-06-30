@@ -48,6 +48,8 @@ Do not build these in the first version:
 - payment/donation flows
 - AI-generated postcards
 - heavy social network mechanics
+- separate public submit page
+- separate public page for every short letter
 
 ## Target users
 
@@ -146,6 +148,29 @@ Hero idea:
 
 Clicking the heart or random button opens a letter modal.
 
+Clicking `Write your letter` opens the submit modal. Do not route the user to a separate submit page for MVP.
+
+### Submit modal
+
+The submit modal is the main writing experience.
+
+Step 1 fields:
+
+- letter text
+- author name optional
+- anonymous checkbox
+- city optional
+- country optional
+- language optional
+- consent checkbox
+
+Step 2 after successful submit:
+
+- show archive number
+- optional email field
+- `Send link to my email`
+- `Skip`
+
 ### Letter modal
 
 The modal is the main reading experience.
@@ -196,23 +221,23 @@ Preferred labels:
 
 ### Sharing
 
-Each approved letter should be shareable.
+Each approved letter should be shareable, but MVP should not create a classic standalone page for every short letter.
 
-User experience can still be modal-first, but shared links should open the correct letter in a modal.
-
-Possible route:
+Use query-parameter deep links that open the selected letter in modal, for example:
 
 ```txt
-/letter/000127
-```
-
-or
-
-```txt
+/?letter=000127
 /archive?letter=000127
 ```
 
-Recommendation: implement whichever is simpler in Next.js, but keep the visual experience modal-based.
+Recommended behavior:
+
+- from homepage random modal, share `/?letter=000127`
+- from archive modal, share `/archive?letter=000127`
+- opening either link loads the normal page and opens the letter modal automatically
+- if the letter is missing or not approved, show a safe unavailable state in the modal/page area
+
+Do not implement `/letter/[archiveNumber]` for MVP unless explicitly requested later.
 
 ## Archive page
 
@@ -225,6 +250,8 @@ Suggested sections/tabs:
 - Most shared
 - Latest
 - Search by number
+
+Clicking a card opens the letter modal.
 
 Optional later:
 
