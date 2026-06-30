@@ -6,6 +6,12 @@ The platform should feel like opening and leaving real letters, not like filling
 
 Keep the emotional action first. Ask for practical data only when needed.
 
+MVP is modal-first:
+
+- reading happens in a letter modal
+- writing happens in a submit modal
+- sharing opens the normal homepage/archive with the selected letter in a modal
+
 ## Main public navigation
 
 Suggested header:
@@ -13,7 +19,7 @@ Suggested header:
 ```txt
 Logo
 Archive
-Submit a Letter
+Write your letter
 About
 Language switch
 ```
@@ -28,7 +34,7 @@ On desktop: bottom-right floating pill/button.
 
 On mobile: bottom sticky pill/button, easy to tap.
 
-Hide sticky CTA on the submit page and when the submit modal/form is already open.
+Hide sticky CTA when the submit modal is already open.
 
 ## Homepage flow
 
@@ -56,6 +62,8 @@ Clicking the heart or `Open random letter`:
 4. Provide `Another random letter` action.
 5. Provide subtle `Write your own letter` action inside modal.
 
+Clicking `Write your letter` opens the submit modal, not a separate page.
+
 ## Letter modal flow
 
 ### Modal content
@@ -64,7 +72,7 @@ Clicking the heart or `Open random letter`:
 № 000127
 12.07.2026
 
-“Letter text...”
+“Letter text..."
 
 — Anna, Jūrmala
 
@@ -79,20 +87,29 @@ Clicking the heart or `Open random letter`:
 - Heart/like
 - Share
 - Open another random letter
+- Open submit modal
 - Close
 
 ### Share behavior
 
 Share should copy/share a link that opens the same letter in modal.
 
-Possible implementations:
+Use query-parameter deep links:
 
-- `/letter/000127` route that renders the normal layout with letter modal open
-- `/archive?letter=000127` query param that opens modal on archive page
+```txt
+/?letter=000127
+/archive?letter=000127
+```
 
-The visual experience should remain modal-first.
+Behavior:
 
-## Submit letter flow
+- `/?letter=000127` opens homepage and then opens the selected letter modal
+- `/archive?letter=000127` opens archive and then opens the selected letter modal
+- if the letter is missing or not approved, show a safe unavailable state
+
+Do not implement a separate `/letter/[archiveNumber]` page for MVP.
+
+## Submit letter modal flow
 
 ### Step 1: Write letter
 
@@ -129,7 +146,7 @@ Russian draft:
 
 ### Step 2: Confirmation after submit
 
-Immediately after submission:
+Immediately after submission, keep the user in the same modal and show:
 
 ```txt
 Your letter has been received for moderation.
@@ -199,6 +216,8 @@ Jūrmala / Latvia / Worldwide
 
 Clicking any archive card opens the letter modal.
 
+Opening `/archive?letter=000127` should load the archive and open that letter modal if the letter is approved.
+
 ## Like flow
 
 Visitor clicks heart:
@@ -219,7 +238,7 @@ When visitor clicks share:
 1. Increment/share-track according to selected behavior.
 2. Use native Web Share API where available.
 3. Fallback to copy link.
-4. Link should open the exact letter in modal.
+4. Link should open the exact letter in modal using query param.
 
 Do not make sharing dependent on login.
 
@@ -266,6 +285,12 @@ The archive is just beginning. Be the first to leave a letter for the future.
 No published letters are available yet. You can write the first one.
 ```
 
+### Deep-linked letter unavailable
+
+```txt
+This letter is not available in the public archive yet.
+```
+
 ### Submission successful but email failed
 
 ```txt
@@ -277,4 +302,5 @@ Your letter was received, but we could not send the email right now. Please save
 - Heart visual should remain central but not too tall.
 - Sticky `Write your letter` button should not cover archive cards or form controls.
 - Letter modal should be full-screen or near full-screen on mobile.
-- Use large tap targets for heart/share/random.
+- Submit modal should also be full-screen or near full-screen on mobile.
+- Use large tap targets for heart/share/random/submit.
